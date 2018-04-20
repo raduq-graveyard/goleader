@@ -1,1 +1,5 @@
-log: blabla
+steps:
+  - name: log
+    value: blabla
+  - name: log
+    value: huehue

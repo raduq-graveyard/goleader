@@ -20,26 +20,36 @@ func main() {
 	app.Run(os.Args)
 }
 
+type Step struct {
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
+}
+
+type Recipe struct {
+	Steps []Step `yaml:"steps"`
+}
+
 //FIXME - code smell, melhorar algum dia
 func defaultAction(c *cli.Context) {
 	var filename = "./recipes/sample.yml" //TODO - receive by cli
 
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot unmarshal data: %v", err)
 	}
 
-	var prop map[string]string
-	err = yaml.Unmarshal(yamlFile, &prop)
+	var r Recipe
+	err = yaml.Unmarshal(yamlFile, &r)
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot unmarshal data: %v", err)
 	}
-	for key, value := range prop {
-		if strings.EqualFold(key, "log") {
+
+	for _, step := range r.Steps {
+		if strings.EqualFold(step.Name, "log") {
 			var logger = worker.NewLog()
-			logger.Log(value)
+			logger.Log(step.Value)
 		} else {
-			log.Fatalf("Command '%s' not implemented", key)
+			log.Fatalf("Command '%s' not implemented", step.Name)
 		}
 	}
 }
